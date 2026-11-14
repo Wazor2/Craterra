@@ -1,0 +1,56 @@
+[
+  {
+    "id": "shackleton_rim",
+    "name": "Shackleton Crater Rim",
+    "lat": -89.54,
+    "lon": 129.78,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/missions/artemis/artemis-iii-candidate-landing-regions/",
+    "description": "Narrow elevated ridge along Shackleton Crater rim; high solar duty cycle with intermittent Earth visibility obstructed by local polar ridges."
+  },
+  {
+    "id": "connecting_ridge",
+    "name": "Connecting Ridge (Shackleton–de Gerlache)",
+    "lat": -89.45,
+    "lon": 222.7,
+    "type": "south_pole",
+    "source_url": "https://quickmap.lroc.asu.edu/?extent=-180,-90,180,-80",
+    "description": "High-standing crest linking Shackleton and de Gerlache craters; sustained sunlight peaks across most of the lunar day with narrow landing tolerances."
+  },
+  {
+    "id": "malapert_massif",
+    "name": "Malapert Massif Summit",
+    "lat": -85.98,
+    "lon": 359.55,
+    "type": "south_pole",
+    "source_url": "https://trek.nasa.gov/moon/",
+    "description": "Prominent 5 km summit near 0 deg longitude facing Earth; strong direct-to-Earth margin across negative latitude librations with seasonal solar dips."
+  },
+  {
+    "id": "nobile_rim",
+    "name": "Nobile Crater Rim West",
+    "lat": -85.22,
+    "lon": 51.35,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/viper/",
+    "description": "Western flank of Nobile Crater; undulating highland horizon creates pronounced solar shadows and variable Earth occultation windows."
+  },
+  {
+    "id": "apollo_11",
+    "name": "Apollo 11 — Mare Tranquillitatis",
+    "lat": 0.674,
+    "lon": 23.473,
+    "type": "apollo",
+    "source_url": "https://www.nasa.gov/mission/apollo-11/",
+    "description": "Equatorial mare baseline with low flat horizon, continuous high-elevation Earth contact, and classic 14.8-day lunar day/night cycles."
+  },
+  {
+    "id": "apollo_17",
+    "name": "Apollo 17 — Taurus-Littrow Valley",
+    "lat": 20.191,
+    "lon": 30.772,
+    "type": "apollo",
+    "source_url": "https://www.nasa.gov/mission/apollo-17/",
+    "description": "Deep highland valley flanked by North and South Massifs (16–19 deg horizon peaks), delaying sunrise and advancing sunset despite mid-latitude Earth visibility."
+  }
+]
