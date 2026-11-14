@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "path": "/", "title": "Site planner" },
+    { "path": "/compare", "title": "Compare sites and dates" },
+    { "path": "/about", "title": "Methodology and sources" }
+  ]
+}
+

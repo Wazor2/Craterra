@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "coordinate_frame": "MOON_ME",
+  "latitude_type": "planetocentric",
+  "longitude_convention": "east_positive",
+  "sites": [
+    {
+      "site_id": "shackleton-rim",
+      "name": "Shackleton Crater Rim (Site 04)",
+      "category": "south_pole_candidate_region",
+      "latitude_deg": -89.9,
+      "longitude_east_deg": 0.0,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 1900,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "A prominent Artemis candidate region on the elevated rim of Shackleton Crater (-89.9°S). Features near-permanent illumination on high peaks alongside deep permanent shadow within the crater interior.",
+      "provenance": {
+        "coordinate_status": "derived_representative_point",
+        "source_urls": [
+          "https://www.nasa.gov/feature/shackleton-crater-lunar-south-pole",
+          "https://pgda.gsfc.nasa.gov/products/78"
+        ],
+        "note": "Representative point on the Shackleton crater ridge derived from NASA GSFC PGDA high-resolution LOLA polar products."
+      }
+    },
+    {
+      "site_id": "connecting-ridge",
+      "name": "Connecting Ridge (Site 01)",
+      "category": "south_pole_candidate_region",
+      "latitude_deg": -89.44,
+      "longitude_east_deg": -137.4,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 1850,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "Connecting Ridge between Shackleton and de Gerlache craters. One of NASA's highest-priority Artemis III exploration zones, offering strategic illumination windows and cross-crater line-of-sight.",
+      "provenance": {
+        "coordinate_status": "derived_representative_point",
+        "source_urls": [
+          "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/",
+          "https://pgda.gsfc.nasa.gov/products/78"
+        ],
+        "note": "Candidate region representative point derived from NASA PGDA Site01 LOLA elevation data."
+      }
+    },
+    {
+      "site_id": "malapert-massif",
+      "name": "Malapert Massif (Site 23)",
+      "category": "south_pole_candidate_region",
+      "latitude_deg": -85.9,
+      "longitude_east_deg": 2.9,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 5000,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "Massive 5,000 m mountain massif near the south pole. Outstanding line-of-sight directly towards Earth provides nearly continuous geometric communications visibility, combined with high solar illumination.",
+      "provenance": {
+        "coordinate_status": "derived_representative_point",
+        "source_urls": [
+          "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-landing-next-americans-on-moon/",
+          "https://pgda.gsfc.nasa.gov/products/78"
+        ],
+        "note": "Representative point on Malapert Massif peak derived from NASA PGDA Site23 elevation dataset."
+      }
+    },
+    {
+      "site_id": "peak-near-shackleton",
+      "name": "Peak near Shackleton (Site 07)",
+      "category": "south_pole_candidate_region",
+      "latitude_deg": -89.7,
+      "longitude_east_deg": 126.0,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 1720,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "Elevated topographic high near Shackleton with high percentage solar availability during lunar summer, situated on the edge of the South Pole-Aitken basin.",
+      "provenance": {
+        "coordinate_status": "derived_representative_point",
+        "source_urls": [
+          "https://www.nasa.gov/feature/what-s-so-special-about-the-moon-s-south-pole",
+          "https://pgda.gsfc.nasa.gov/products/78"
+        ],
+        "note": "Representative location derived from NASA GSFC PGDA Site07 5m/pixel polar stereographic product."
+      }
+    },
+    {
+      "site_id": "amundsen-ritchie",
+      "name": "Amundsen–Ritchie Rim",
+      "category": "south_pole_candidate_region",
+      "latitude_deg": -84.6,
+      "longitude_east_deg": 120.5,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 1400,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "A rugged south-polar candidate region on the rim of Amundsen crater with complex topographic shadow casting and intermittent Earth visibility.",
+      "provenance": {
+        "coordinate_status": "derived_representative_point",
+        "source_urls": [
+          "https://www.nasa.gov/feature/what-s-so-special-about-the-moon-s-south-pole",
+          "https://pds-geosciences.wustl.edu/missions/lro/lola.htm"
+        ],
+        "note": "Regional representative point derived from NASA PDS LOLA polar GDR DEM products."
+      }
+    },
+    {
+      "site_id": "apollo-11",
+      "name": "Apollo 11 Tranquility Base",
+      "category": "apollo",
+      "latitude_deg": 0.67408,
+      "longitude_east_deg": 23.47297,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 0,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "Historic Apollo 11 Lunar Module descent stage in Mare Tranquillitatis. Serves as an equatorial low-relief reference where the Sun rises and sets on an exact 29.5-day cycle with Earth high overhead.",
+      "provenance": {
+        "coordinate_status": "published",
+        "source_urls": [
+          "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "https://www.nasa.gov/mission_pages/apollo/missions/apollo11.html"
+        ],
+        "note": "Published NASA NSSDCA Apollo landing site coordinates in planetocentric DE421/DE440 Mean Earth frame."
+      }
+    },
+    {
+      "site_id": "apollo-17",
+      "name": "Apollo 17 Taurus-Littrow",
+      "category": "apollo",
+      "latitude_deg": 20.1908,
+      "longitude_east_deg": 30.77168,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 0,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "Apollo 17 valley site bounded by steep massifs rising 1.5–2 km above the valley floor. Demonstrates how severe valley terrain blocks sunlight and low-elevation lines of sight.",
+      "provenance": {
+        "coordinate_status": "published",
+        "source_urls": [
+          "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "https://www.nasa.gov/mission_pages/apollo/missions/apollo17.html"
+        ],
+        "note": "Published NASA NSSDCA Apollo 17 landing coordinates in Taurus-Littrow Valley."
+      }
+    },
+    {
+      "site_id": "equatorial-reference",
+      "name": "Sinus Medii (Equatorial Reference)",
+      "category": "equatorial_reference",
+      "latitude_deg": 0.0,
+      "longitude_east_deg": 0.0,
+      "latitude_type": "planetocentric",
+      "frame": "MOON_ME",
+      "elevation_m": 0,
+      "elevation_datum": "radial height above NAIF BODY301_RADII mean sphere (1737.4 km)",
+      "description": "The intersection of the Lunar Equator and Prime Meridian (0°N, 0°E). Ideal mathematical and physical reference where Earth is permanently located directly at the zenith (90° elevation).",
+      "provenance": {
+        "coordinate_status": "published",
+        "source_urls": [
+          "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+          "https://pds-geosciences.wustl.edu/missions/lro/lola.htm"
+        ],
+        "note": "Zero-point coordinate definition for Mean Earth / Polar Axis frame with flat mathematical horizon."
+      }
+    }
+  ]
+}

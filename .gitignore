@@ -1,0 +1,32 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.turbo/
+.cache/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Raw scientific inputs stay local and out of the web bundle
+/data/raw/
+/data/staging/
+/inputs/
+.manus/
+*.bsp
+*.bpc
+*.tif
+*.tiff
+*.jp2
+*.tgz
+*.zip

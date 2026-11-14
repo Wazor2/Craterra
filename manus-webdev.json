@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "projectId": "wdp_0ed859c64476492ae53b905b",
+  "description": "Standalone lunar site planner for comparing NASA LOLA terrain, SPICE lighting geometry, Earth visibility, and mission timelines with scientific provenance and limitations."
+}

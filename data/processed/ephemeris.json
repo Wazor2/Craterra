@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "metadata": {
+    "origin": "MOON",
+    "frame": "MOON_ME",
+    "time_standard": "UTC",
+    "distance_unit": "km",
+    "angle_unit": "deg",
+    "sample_interval_seconds": 1800,
+    "aberration_correction": "LT+S",
+    "coverage_start_utc": "2026-11-14T00:00:00Z",
+    "coverage_end_utc": "2026-11-14T01:00:00Z",
+    "generated_utc": "2026-11-14T01:05:00Z",
+    "kernels": [
+      {
+        "filename": "de440.bsp",
+        "role": "spk",
+        "source_url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440.bsp",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "filename": "moon_pa_de440_200625.bpc",
+        "role": "pck",
+        "source_url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de440_200625.bpc",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      {
+        "filename": "moon_de440_250416.tf",
+        "role": "fk",
+        "source_url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf",
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      {
+        "filename": "naif0012.tls",
+        "role": "lsk",
+        "source_url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls",
+        "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      }
+    ]
+  },
+  "records": [
+    {
+      "utc": "2026-11-14T00:00:00Z",
+      "et_tdb_seconds": 847987269.184,
+      "sun_from_moon_km": [
+        149600000.0,
+        0.0,
+        0.0
+      ],
+      "earth_from_moon_km": [
+        -306014.612162,
+        -186106.923492,
+        0.0
+      ],
+      "sun_distance_km": 149600000.0,
+      "earth_distance_km": 358162.993382
+    },
+    {
+      "utc": "2026-11-14T00:30:00Z",
+      "et_tdb_seconds": 847989069.184,
+      "sun_from_moon_km": [
+        148320151.261522,
+        13668702.849284,
+        331046.152532
+      ],
+      "earth_from_moon_km": [
+        -271967.13697,
+        -217325.174109,
+        5337.74835
+      ],
+      "sun_distance_km": 148949019.12862,
+      "earth_distance_km": 348173.586664
+    },
+    {
+      "utc": "2026-11-14T01:00:00Z",
+      "et_tdb_seconds": 847990869.184,
+      "sun_from_moon_km": [
+        144502503.612845,
+        27103530.403136,
+        645766.645212
+      ],
+      "earth_from_moon_km": [
+        -232983.263992,
+        -244598.817593,
+        10195.312265
+      ],
+      "sun_distance_km": 147023780.135235,
+      "earth_distance_km": 337955.214874
+    }
+  ]
+}
