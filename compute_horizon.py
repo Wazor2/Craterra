@@ -10,18 +10,24 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 MOON_RADIUS = 1737400.0  # meters
+DEM_40M_URL = "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_40MPP_ADJ.TIF"
+DEM_80M_LOCAL = "raw/LDEM_80S_80MPP_ADJ.TIF"
+DEM_40M_LOCAL = "raw/LDEM_80S_40MPP_ADJ.TIF"
+
+# Configure GDAL for fast HTTP streaming of tiled Cloud-Optimized GeoTIFFs
+os.environ['GDAL_DISABLE_READDIR_ON_OPEN'] = 'EMPTY_DIR'
+os.environ['CPL_VSIL_CURL_ALLOWED_EXTENSIONS'] = '.TIF'
+os.environ['GDAL_HTTP_MERGE_CONSECUTIVE_RANGES'] = 'YES'
+os.environ['VSI_CACHE'] = 'TRUE'
+os.environ['VSI_CACHE_SIZE'] = '100000000'
 
 def compute_hillshade(dem_array, res=80.0, alt_deg=25.0, az_deg=315.0):
-    """
-    Computes a hillshade representation of a 2D DEM array.
-    """
     valid = np.nan_to_num(dem_array, nan=np.nanmedian(dem_array) if not np.isnan(np.nanmedian(dem_array)) else 0.0)
     dy, dx = np.gradient(valid, res, res)
     slope = np.arctan(np.hypot(dx, dy))
     aspect = np.arctan2(-dy, dx)
     
     alt_rad = np.radians(alt_deg)
-    # Convert azimuth (clockwise from North/Up) to mathematical polar angle
     az_rad = np.radians(360.0 - az_deg + 90.0)
     
     shaded = np.sin(alt_rad) * np.cos(slope) + np.cos(alt_rad) * np.sin(slope) * np.cos(az_rad - aspect)
@@ -29,53 +35,23 @@ def compute_hillshade(dem_array, res=80.0, alt_deg=25.0, az_deg=315.0):
     return shaded
 
 def get_local_north_and_east(lat, lon, transformer):
-    """
-    Computes the local true North and East unit vectors in projected DEM coordinates (meters).
-    """
     x0, y0 = transformer.transform(lon, lat)
-    
-    # Step slightly North in latitude (towards equator, lat > -90)
     d_lat = 0.01
     xn, yn = transformer.transform(lon, lat + d_lat)
     vn = np.array([xn - x0, yn - y0], dtype=np.float64)
     vn_norm = np.linalg.norm(vn)
     u_north = vn / vn_norm
-    
-    # True East in a conformal south polar stereographic projection is
-    # exactly 90 degrees clockwise from True North in the (x, y) plane.
-    # In Cartesian (x, y), a 90 deg clockwise rotation turns (nx, ny) into (ny, -nx).
     u_east = np.array([u_north[1], -u_north[0]], dtype=np.float64)
-    
     grid_north_angle_deg = np.degrees(np.arctan2(u_north[1], u_north[0]))
     return u_north, u_east, grid_north_angle_deg
 
-def sample_site_elevation(src, x_site, y_site):
-    """
-    Sample elevation at exact site position with bilinear interpolation.
-    """
-    row, col = src.index(x_site, y_site)
-    # Read 3x3 around site
-    win = rasterio.windows.Window(col - 1, row - 1, 3, 3)
-    data = src.read(1, window=win)
-    # Site is at offset (col - (col - 1), row - (row - 1)) = (1, 1) in window
-    # Convert exact coords to subpixel index
-    sub_col = (x_site - (src.transform.c + (col - 1) * src.transform.a)) / src.transform.a - 0.5
-    sub_row = (y_site - (src.transform.f + (row - 1) * src.transform.e)) / src.transform.e - 0.5
-    z = map_coordinates(data, [[sub_row], [sub_col]], order=1, mode='nearest')[0]
-    return float(z)
-
 def compute_horizon_site(src, site, transformer, max_dist_m=60000.0, step_m=80.0, mast_height_m=0.0):
-    """
-    Computes the 360-value horizon profile for a site.
-    """
     lat, lon = site["lat"], site["lon"]
     x_site, y_site = transformer.transform(lon, lat)
     
-    # 1. Local North and East unit vectors
     u_north, u_east, grid_north_deg = get_local_north_and_east(lat, lon, transformer)
     
-    # 2. Window bounds (max_distance + margin)
-    margin = step_m * 25.0  # 2 km margin
+    margin = step_m * 25.0
     radius = max_dist_m + margin
     left = max(src.bounds.left, x_site - radius)
     right = min(src.bounds.right, x_site + radius)
@@ -83,53 +59,35 @@ def compute_horizon_site(src, site, transformer, max_dist_m=60000.0, step_m=80.0
     top = min(src.bounds.top, y_site + radius)
     
     win = from_bounds(left, bottom, right, top, transform=src.transform)
-    # Snap window to integer pixels
     win = win.round_offsets().round_lengths()
     win_transform = rasterio.windows.transform(win, src.transform)
     
-    # Read only this window of DEM
     dem_win = src.read(1, window=win)
     
-    # Sample exact site elevation from window
     sub_c_site = (x_site - win_transform.c) / win_transform.a - 0.5
     sub_r_site = (y_site - win_transform.f) / win_transform.e - 0.5
     z_site = float(map_coordinates(dem_win, [[sub_r_site], [sub_c_site]], order=1, mode='nearest')[0])
     
-    # 3. Build rays for 360 azimuths (0 to 359 degrees)
-    az_deg = np.arange(360, dtype=np.float64)  # 0..359
+    az_deg = np.arange(360, dtype=np.float64)
     az_rad = np.radians(az_deg)
     
-    # Ray unit vectors: u(A) = cos(A)*u_north + sin(A)*u_east
-    # Shape: (360, 2)
     ux = np.cos(az_rad) * u_north[0] + np.sin(az_rad) * u_east[0]
     uy = np.cos(az_rad) * u_north[1] + np.sin(az_rad) * u_east[1]
     
-    # Distance steps along each ray (skip d=0)
     d = np.arange(step_m, max_dist_m + 0.1, step_m, dtype=np.float64)
-    # Shape of d: (N_d,)
-    # Sample coordinates: X, Y shape: (360, N_d)
     X = x_site + ux[:, None] * d[None, :]
     Y = y_site + uy[:, None] * d[None, :]
     
-    # Map (X, Y) to fractional pixel coordinates inside dem_win
-    # X = win_transform.c + (col + 0.5) * win_transform.a
-    # Y = win_transform.f + (row + 0.5) * win_transform.e (note win_transform.e < 0)
     cols = (X - win_transform.c) / win_transform.a - 0.5
     rows = (Y - win_transform.f) / win_transform.e - 0.5
     
-    # 4. Bilinear interpolation of terrain heights z along all rays
     coords = np.vstack([rows.ravel(), cols.ravel()])
     z_samples = map_coordinates(dem_win, coords, order=1, mode='nearest').reshape(360, len(d))
     
-    # 5. Moon curvature drop: drop = R - sqrt(R^2 - d^2)
-    # In float64 to ensure high numerical precision
     drop = MOON_RADIUS - np.sqrt(MOON_RADIUS**2 - d**2)
-    
-    # 6. Elevation angle: atan2(z - z_site - mast_height - drop, d)
     delta_z = z_samples - (z_site + mast_height_m) - drop[None, :]
     angles_deg = np.degrees(np.arctan2(delta_z, d[None, :]))
     
-    # Maximum elevation angle along each ray is the horizon
     horizon_deg = np.max(angles_deg, axis=1)
     
     return {
@@ -151,14 +109,10 @@ def compute_horizon_site(src, site, transformer, max_dist_m=60000.0, step_m=80.0
     }
 
 def plot_and_verify_site(res, plots_dir):
-    """
-    Creates horizon plot, polar plot, and local hillshade map with True North arrow.
-    """
     site_id = res["site_id"]
     name = res["name"]
     horizon = res["horizon_deg"]
     
-    # 1. Horizon Line Plot (Elevation vs Azimuth)
     fig, ax = plt.subplots(figsize=(10, 4), dpi=150)
     az = np.arange(360)
     ax.plot(az, horizon, color="#1f77b4", lw=1.8, label="Horizon Profile")
@@ -177,47 +131,32 @@ def plot_and_verify_site(res, plots_dir):
     ax.grid(True, linestyle=":", alpha=0.6)
     ax.legend(loc="upper right", framealpha=0.9)
     fig.tight_layout()
-    horizon_plot_path = os.path.join(plots_dir, f"{site_id}_horizon.png")
-    fig.savefig(horizon_plot_path)
+    fig.savefig(os.path.join(plots_dir, f"{site_id}_horizon.png"))
     plt.close(fig)
     
-    # 2. Polar Plot (Compass View)
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={"projection": "polar"}, dpi=150)
     theta = np.radians(az)
-    # In polar plot, North is at top (pi/2) and clockwise azimuth decreases math angle
     ax.set_theta_zero_location("N")
-    ax.set_theta_direction(-1)  # Clockwise
-    
-    # Plot horizon elevation
+    ax.set_theta_direction(-1)
     ax.plot(theta, horizon, color="#0055ff", lw=1.5)
-    # Fill between minimum and horizon
-    min_val = min(0.0, np.floor(np.min(horizon)))
     ax.fill(theta, horizon, color="#0055ff", alpha=0.25)
     ax.set_title(f"Polar Horizon View: {name}", va="bottom", pad=15)
     fig.tight_layout()
-    polar_plot_path = os.path.join(plots_dir, f"{site_id}_polar.png")
-    fig.savefig(polar_plot_path)
+    fig.savefig(os.path.join(plots_dir, f"{site_id}_polar.png"))
     plt.close(fig)
     
-    # 3. Local Hillshade with True North Arrow
     dem_win = res["dem_win"]
     hs = compute_hillshade(dem_win, res=80.0)
-    
     fig, ax = plt.subplots(figsize=(7, 7), dpi=150)
     ax.imshow(hs, cmap="gray", origin="upper")
     
-    # Mark site location
     r_site, c_site = res["sub_r_site"], res["sub_c_site"]
     ax.plot(c_site, r_site, marker="*", color="red", markersize=14, markeredgecolor="yellow", markeredgewidth=1.2, label=f"Site: {name}")
     
-    # Draw True North Arrow
-    # Vector in grid coordinates is u_north = (nx, ny). In pixel coordinates, +X is +col, +Y is -row!
-    # Arrow length: 15% of window width
     arrow_len = 0.15 * dem_win.shape[1]
     dx_col = arrow_len * res["u_north"][0]
-    dy_row = -arrow_len * res["u_north"][1]  # row decreases upwards
+    dy_row = -arrow_len * res["u_north"][1]
     
-    # Arrow base slightly offset from site or top corner
     ax.annotate("", xy=(c_site + dx_col, r_site + dy_row), xytext=(c_site, r_site),
                 arrowprops=dict(facecolor="cyan", edgecolor="black", width=2.5, headwidth=9))
     ax.text(c_site + dx_col * 1.15, r_site + dy_row * 1.15, "True North", color="cyan", 
@@ -228,16 +167,11 @@ def plot_and_verify_site(res, plots_dir):
     ax.axis("off")
     ax.legend(loc="lower right", facecolor="white", framealpha=0.85)
     fig.tight_layout()
-    map_plot_path = os.path.join(plots_dir, f"{site_id}_terrain_north.png")
-    fig.savefig(map_plot_path)
+    fig.savefig(os.path.join(plots_dir, f"{site_id}_terrain_north.png"))
     plt.close(fig)
 
 def generate_south_pole_hillshade(dem_path, out_path):
-    """
-    Creates a small, compressed hillshade PNG of the entire South Pole region (under 2 MB).
-    """
     with rasterio.open(dem_path) as src:
-        # Downsample 4x to 1900 x 1900
         down_shape = (src.height // 4, src.width // 4)
         down_dem = src.read(1, out_shape=down_shape, resampling=rasterio.enums.Resampling.bilinear)
         res_m = src.res[0] * 4.0
@@ -249,99 +183,113 @@ def generate_south_pole_hillshade(dem_path, out_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Lunar South Pole Horizon Profile Generator")
+    parser.add_argument("--res", type=int, choices=[40, 80], default=80, help="DEM resolution in meters (80 or 40, default: 80)")
+    parser.add_argument("--dem", type=str, default=None, help="Custom DEM path or URL")
     parser.add_argument("--mast-height", type=float, default=0.0, help="Observer mast height in meters (default: 0.0)")
     parser.add_argument("--max-dist", type=float, default=60000.0, help="Max terrain horizon distance in meters (default: 60000.0)")
-    parser.add_argument("--step", type=float, default=80.0, help="Ray sampling step size in meters (default: 80.0)")
+    parser.add_argument("--step", type=float, default=None, help="Ray sampling step in meters (default: matching resolution)")
+    parser.add_argument("--site", type=str, default="all", help="Site ID to process or 'all' (default: all)")
     parser.add_argument("--sites", type=str, default="sites.json", help="Path to sites.json")
-    parser.add_argument("--dem", type=str, default="raw/LDEM_80S_80MPP_ADJ.TIF", help="Path to LOLA DEM GeoTIFF")
+    parser.add_argument("--compare-with-80", action="store_true", help="Compare computed horizon against 80m baseline")
     args = parser.parse_args()
 
-    os.makedirs("output/horizon", exist_ok=True)
-    os.makedirs("output/plots", exist_ok=True)
+    step_m = args.step if args.step is not None else float(args.res)
+    if args.dem is not None:
+        dem_source_path = args.dem
+    elif args.res == 40:
+        if os.path.exists(DEM_40M_LOCAL):
+            dem_source_path = DEM_40M_LOCAL
+            print(f"Using local 40m DEM: {dem_source_path}")
+        else:
+            dem_source_path = DEM_40M_URL
+            print(f"Local 40m file not found. Streaming windowed reads directly from NASA COG: {dem_source_path}")
+    else:
+        dem_source_path = DEM_80M_LOCAL
+        print(f"Using 80m DEM: {dem_source_path}")
 
-    print("=" * 70)
-    print("STEP 3: LOCAL NORTH CALCULATION")
-    print("=" * 70)
-    
-    # Coordinate system setup
+    dem_label = f"LOLA LDEM_80S_{args.res}MPP_ADJ (PGDA)"
+
+    out_json_dir = "output/horizon" if args.res == 80 else "output/horizon_40m"
+    out_plots_dir = "output/plots" if args.res == 80 else "output/plots_40m"
+    os.makedirs(out_json_dir, exist_ok=True)
+    os.makedirs(out_plots_dir, exist_ok=True)
+
     geo_crs = pyproj.CRS.from_proj4(f"+proj=longlat +R={MOON_RADIUS} +no_defs")
     dem_crs = pyproj.CRS.from_string("IAU:30135")
     transformer = pyproj.Transformer.from_crs(geo_crs, dem_crs, always_xy=True)
     
     with open(args.sites, "r", encoding="utf-8") as f:
-        sites = json.load(f)
+        all_sites = json.load(f)
         
-    for s in sites:
-        u_n, u_e, g_north_deg = get_local_north_and_east(s["lat"], s["lon"], transformer)
-        print(f"Site: {s['name']:25s} (ID: {s['id']})")
-        print(f"  Lat / Lon:         {s['lat']:.2f}°, {s['lon']:.2f}°")
-        print(f"  True North Vector: ({u_n[0]:.4f}, {u_n[1]:.4f}) -> Grid Heading: {g_north_deg:6.2f}°")
-        print(f"  True East Vector:  ({u_e[0]:.4f}, {u_e[1]:.4f}) (90° clockwise from North)")
-        print("-" * 60)
+    if args.site != "all":
+        sites = [s for s in all_sites if s["id"] == args.site]
+        if not sites:
+            print(f"Error: Site ID '{args.site}' not found in {args.sites}")
+            return
+    else:
+        sites = all_sites
 
-    print("\n" + "=" * 70)
-    print(f"STEP 4: HORIZON PROFILE CALCULATION (Mast Height = {args.mast_height} m, Max Dist = {args.max_dist/1000:.0f} km)")
+    print("=" * 70)
+    print(f"HORIZON CALCULATION: Resolution={args.res}m, Step={step_m}m, Mast={args.mast_height}m")
+    print(f"Sites to process: {[s['id'] for s in sites]}")
     print("=" * 70)
 
     results = []
-    with rasterio.open(args.dem) as src:
+    with rasterio.open(dem_source_path) as src:
         for s in sites:
-            print(f"Processing site '{s['id']}' ({s['name']})...")
+            print(f"\nProcessing '{s['id']}' ({s['name']})...")
             res = compute_horizon_site(src, s, transformer, 
                                        max_dist_m=args.max_dist, 
-                                       step_m=args.step, 
+                                       step_m=step_m, 
                                        mast_height_m=args.mast_height)
             results.append(res)
             
-            # Step 5: Checks & Visualizations
-            plot_and_verify_site(res, "output/plots")
+            plot_and_verify_site(res, out_plots_dir)
             
-            # Step 6: Output JSON
             elev_rounded = [float(round(val, 2)) for val in res["horizon_deg"]]
             json_out = {
                 "site_id": s["id"],
                 "az_step_deg": 1,
                 "elev_deg": elev_rounded,
                 "mast_height_m": args.mast_height,
-                "dem_source": "LOLA LDEM_80S_80MPP_ADJ (PGDA)"
+                "dem_source": dem_label
             }
-            json_path = os.path.join("output", "horizon", f"{s['id']}.json")
+            json_path = os.path.join(out_json_dir, f"{s['id']}.json")
             with open(json_path, "w", encoding="utf-8") as jf:
                 json.dump(json_out, jf, indent=2)
-                
-    print("\n" + "=" * 70)
-    print("STEP 5: CHECKS & SUMMARY STATISTICS")
-    print("=" * 70)
-    print(f"{'Site ID':20s} | {'Min (°)':>8s} | {'Max (°)':>8s} | {'Mean (°)':>8s} | {'Peak Az (°)':>11s} | {'Status':>12s}")
-    print("-" * 72)
-    
-    for res in results:
-        h = res["horizon_deg"]
-        h_min = float(np.min(h))
-        h_max = float(np.max(h))
-        h_mean = float(np.mean(h))
-        peak_az = int(np.argmax(h))
-        
-        # Check validity
-        has_nan = bool(np.isnan(h).any())
-        all_identical = bool(np.all(h == h[0]))
-        
-        if has_nan:
-            status = "FLAG: NaN"
-        elif all_identical:
-            status = "FLAG: Flat"
-        else:
-            status = "VALID (OK)"
-            
-        print(f"{res['site_id']:20s} | {h_min:8.2f} | {h_max:8.2f} | {h_mean:8.2f} | {peak_az:11d} | {status:>12s}")
+            print(f"  Saved horizon JSON: {json_path}")
 
     print("\n" + "=" * 70)
-    print("STEP 6: GENERATING WHOLE SOUTH POLE HILLSHADE MAP BACKGROUND")
+    print(f"SUMMARY STATISTICS ({args.res}m Resolution)")
     print("=" * 70)
-    sp_hillshade_path = "output/south_pole_hillshade.png"
-    generate_south_pole_hillshade(args.dem, sp_hillshade_path)
-    
-    print("\nAll steps completed successfully!")
+    print(f"{'Site ID':20s} | {'Min (°)':>8s} | {'Max (°)':>8s} | {'Mean (°)':>8s} | {'Peak Az (°)':>11s}")
+    print("-" * 65)
+    for res in results:
+        h = res["horizon_deg"]
+        print(f"{res['site_id']:20s} | {np.min(h):8.2f} | {np.max(h):8.2f} | {np.mean(h):8.2f} | {int(np.argmax(h)):11d}")
+
+    if args.compare_with_80 or args.res == 40:
+        print("\n" + "=" * 70)
+        print("COMPARISON: 40m DEM vs. 80m Baseline Horizon")
+        print("=" * 70)
+        print(f"{'Site ID':20s} | {'Mean Diff':>10s} | {'Max Diff':>9s} | {'RMS Diff':>9s} | {'Peak Az Diff':>13s}")
+        print("-" * 70)
+        for res in results:
+            s_id = res["site_id"]
+            h_80_file = os.path.join("output/horizon", f"{s_id}.json")
+            if os.path.exists(h_80_file):
+                with open(h_80_file) as f:
+                    h80 = np.array(json.load(f)["elev_deg"])
+                h_new = np.round(res["horizon_deg"], 2)
+                diff = h_new - h80
+                abs_diff = np.abs(diff)
+                mean_abs = float(np.mean(abs_diff))
+                max_abs = float(np.max(abs_diff))
+                rms = float(np.sqrt(np.mean(diff**2)))
+                peak_diff = abs(int(np.argmax(h_new)) - int(np.argmax(h80)))
+                print(f"{s_id:20s} | {mean_abs:9.4f}° | {max_abs:8.4f}° | {rms:8.4f}° | {peak_diff:12d}°")
+            else:
+                print(f"{s_id:20s} | (80m baseline file not found)")
 
 if __name__ == "__main__":
     main()
