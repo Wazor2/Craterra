@@ -1,0 +1,56 @@
+[
+  {
+    "id": "shackleton_rim",
+    "name": "Shackleton Crater Rim",
+    "lat": -89.90,
+    "lon": 0.00,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "Rim of Shackleton crater near the south pole with high solar illumination."
+  },
+  {
+    "id": "connecting_ridge",
+    "name": "Connecting Ridge",
+    "lat": -89.44,
+    "lon": -137.31,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "Ridge connecting Shackleton and de Gerlache craters."
+  },
+  {
+    "id": "malapert_mountain",
+    "name": "Malapert Mountain",
+    "lat": -85.99,
+    "lon": 2.93,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "High-altitude massif offering extensive line-of-sight to Earth and persistent illumination."
+  },
+  {
+    "id": "haworth_rim",
+    "name": "Haworth Crater Rim",
+    "lat": -87.40,
+    "lon": -5.10,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "Elevated terrain near the rim of Haworth crater."
+  },
+  {
+    "id": "nobile_rim",
+    "name": "Nobile Crater Rim",
+    "lat": -85.24,
+    "lon": 35.80,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "Candidate landing region near the rim of Nobile crater."
+  },
+  {
+    "id": "de_gerlache_rim",
+    "name": "de Gerlache Crater Rim",
+    "lat": -88.48,
+    "lon": -88.35,
+    "type": "south_pole",
+    "source_url": "https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-iii-lunar-landing/",
+    "description": "Elevated ridge crest on the rim of de Gerlache crater."
+  }
+]
