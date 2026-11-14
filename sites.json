@@ -1,0 +1,5 @@
+[
+  {"id": "apollo11",       "lat": 0.6741, "lon": 23.473, "alt_km": 0},
+  {"id": "malapert",       "lat": -86.0,  "lon": 0.0,    "alt_km": 0},
+  {"id": "shackleton_rim", "lat": -89.9,  "lon": 129.2,  "alt_km": 0}
+]
