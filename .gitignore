@@ -1,2 +1,7 @@
 raw/
 .venv/
+
+# Python cache files
+__pycache__/
+_pycache_/
+*.py[cod]
