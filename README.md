@@ -51,4 +51,4 @@ npm run build    # static export to ./out
 No AI tool is a commit author or contributor; all commits are made by team members from their own accounts. Data files in `public/data/` marked MOCK are placeholders until replaced with real Horizons/LOLA outputs.
 
 ## Credits
-NASA JPL Horizons, NASA LRO LOLA, NASA Moon Trek and Quickmap, CSA Moon Exploration portal. Not endorsed by NASA.
+NASA JPL Horizons, NASA LRO LOLA, NASA Moon Trek and Quickmap, CSA Moon Exploration portal. Not endorsed by NASA.Special thanks to all my teammates.
