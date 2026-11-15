@@ -15,38 +15,15 @@ Cratera is a web app that helps lunar mission planners, educators and the public
  
 ## 👥 Team
  
-**Team name:** [TEAM NAME]
+**Team name:** ERROR-404
  
-| Name | Role | GitHub |
-|---|---|---|
-| [Om Manjule] | [@Wazor2](https://github.com/username) |
-| [Manan Agrawal] | [@username](https://github.com/username) |
-| [SachiSingh Bais] | [@username](https://github.com/username) |
-| [Kalyani Bijwe] | [@liyanshin](https://github.com/username) |
-| [Jaywardhan Sonwane] | [@username](https://github.com/username) |
- 
----
- 
-## 📚 Table of contents
- 
-1. [🌑 The problem](#-the-problem)
-2. [🧭 What Cratera does](#-what-cratera-does)
-3. [✨ Features](#-features)
-4. [⚙️ How it works](#-how-it-works)
-5. [🛰️ Data sources](#-data-sources)
-6. [📍 Sites in the app](#-sites-in-the-app)
-7. [🔬 Method in detail](#-method-in-detail)
-8. [🗂️ Data file formats](#-data-file-formats)
-9. [📁 Project structure](#-project-structure)
-10. [🧰 Tech stack](#-tech-stack)
-11. [🚀 Getting started](#-getting-started)
-12. [🔁 Reproducing the data](#-reproducing-the-data)
-13. [✅ Validation](#-validation)
-14. [⚠️ Limitations](#-limitations)
-15. [🗺️ Roadmap](#-roadmap)
-16. [🤖 AI usage disclosure](#-ai-usage-disclosure)
-17. [🙏 Credits and acknowledgments](#-credits-and-acknowledgments)
-18. [📄 License](#-license)
+| Name | GitHub |
+|---|---|
+| Om Manjule | [@Wazor2](https://github.com/Wazor2) |
+| Manan Agrawal | [@MananAgrawal29](https://github.com/MananAgrawal29) |
+| SachiSingh Bais | [@Sachi-16](https://github.com/Sachi-16) |
+| Kalyani Bijwe | [@liyanshin](https://github.com/liyanshin) |
+| Jaywardhan Sonwane | [@jaysonwanework-debug](https://github.com/jaysonwanework-debug) |
 ---
  
 ## 🌑 The problem
@@ -71,153 +48,113 @@ Cratera turns complex ephemeris and terrain data into clear, comparable visuals.
  
 ## ✨ Features
  
-- [x] 🌐 Interactive Moon globe with clickable landing sites
-- [x] Site info panel (type, coordinates, description)
+## ✨ Features
+ 
+> ✏️ Tick only what is working in the final submission.
+ 
+- [ ] 🌐 Interactive Moon globe with clickable south pole sites
+- [ ] ⛰️ Real, curvature-corrected terrain horizon (360 values) for all 6 sites
+- [ ] 🧭 Local-north handling for the polar grid, with verification plots
 - [ ] 📅 Date and time selection
-- [ ] 🌅 Sky view: Sun and Earth positions against the real terrain horizon
-- [ ] Time until sunset and Earthset, and next sunrise and Earthrise
+- [ ] 🌅 Sky view: Sun and Earth against the terrain horizon
+- [ ] ⏱️ Time until sunset and Earthset, and next sunrise and Earthrise
 - [ ] 📊 Sunlit and Earth-visible timelines across a lunar day
-- [ ] ⚖️ Side-by-side comparison of sites and of dates
-- [ ] Plain-language explanations for non-specialists
-- [ ] 📱 Mobile-friendly layout
+- [ ] ⚖️ Side-by-side comparison of sites and dates
+
+
 ## ⚙️ How it works
  
 ```
- NASA LOLA elevation model            JPL Horizons
- (south pole DEM, PGDA)               (Sun and Earth az/el for each site)
+ NASA LOLA south pole DEM              JPL Horizons
+ (80 m, optional 40 m)                 (Sun and Earth az/el per site)
           |                                      |
           v                                      v
- Horizon profile per site              Sun/Earth position time series
- (360 elevation values)                (azimuth + elevation vs time, UTC)
+ Horizon profile per site              Sun/Earth time series
+ (360 elevation values)                (azimuth + elevation, UTC)
           \                                      /
-           \                                    /
-            v                                  v
-                 Visibility engine (in the browser)
-        "Is the Sun / Earth above the local horizon
-              at its azimuth, at this moment?"
-                           |
-                           v
-        Sky view, timelines, sunset/Earthset times, comparison
+           v                                    v
+              Visibility check in the browser
+      "Is the body above the horizon at its azimuth?"
+                          |
+                          v
+     Sky view, timelines, sunset/Earthset, comparison
 ```
  
 Heavy calculations run **once, offline**, and are saved as small JSON files. The website only loads those files and draws the results, so it is fast, cheap to host and works on any device without a server.
  
-## 🛰️ Data sources
- 
-| Data | Source | Used for |
-|---|---|---|
-| Lunar south pole elevation | NASA LRO **LOLA** gridded DEMs, hosted by the Planetary Geodesy Data Archive (PGDA): `LDEM_80S_80MPP_ADJ.TIF` (80 m/pixel) and `LDEM_80S_40MPP_ADJ.TIF` (40 m/pixel) | Terrain horizon at each site |
-| Sun and Earth positions | NASA/JPL **Horizons** system | Azimuth and elevation of the Sun and Earth over time |
-| Feature names and coordinates | USGS Gazetteer of Planetary Nomenclature, PGDA site files, LROC / Quickmap, NASA mission pages | Site list |
-| Artemis candidate region names | NASA Artemis III candidate regions announcement | Site list |
- 
-Links:
- 
-- LOLA products (PGDA): https://pgda.gsfc.nasa.gov/
-- JPL Horizons: https://ssd.jpl.nasa.gov/horizons/
-- Horizons API docs: https://ssd-api.jpl.nasa.gov/doc/horizons.html
-- Quickmap: https://quickmap.lroc.asu.edu/
-- Moon Trek: https://trek.nasa.gov/moon/
-- USGS Gazetteer: https://planetarynames.wr.usgs.gov/
-> Raw terrain files are large and are **not** stored in this repository. Only small processed JSON files are committed.
- 
 ## 📍 Sites in the app
  
-> Edit this table to match `sites.json`. Mark coordinates as verified only after checking them against the sources above.
+Six south pole sites, all inside the LOLA 80-90°S coverage, each with a real terrain horizon (none use a flat placeholder).
  
-| ID | Name | Type | Latitude | Longitude | Terrain horizon | Coordinates verified |
-|---|---|---|---|---|---|---|
-| `apollo11` | Apollo 11 (Tranquility Base) | Apollo | [lat] | [lon] | Flat (outside terrain coverage) | [yes/no] |
-| `apollo17` | Apollo 17 (Taurus-Littrow) | Apollo | [lat] | [lon] | Flat (outside terrain coverage) | [yes/no] |
-| `shackleton` | Shackleton crater rim | South pole | [lat] | [lon] | LOLA-derived | [yes/no] |
-| `connecting_ridge` | Connecting Ridge | South pole (Artemis candidate) | [lat] | [lon] | LOLA-derived | [yes/no] |
-| `malapert` | Malapert Massif | South pole (Artemis candidate) | [lat] | [lon] | LOLA-derived | [yes/no] |
-| `im1_malapert_a` | IM-1 Odysseus (Malapert A) | Commercial (CLPS) | [lat] | [lon] | LOLA-derived | [yes/no] |
-| `chandrayaan3` | Chandrayaan-3 (Shiv Shakti) | Other agency | [lat] | [lon] | Flat (outside terrain coverage) | [yes/no] |
+| Site | ID | Lat / Lon | Elevation | Horizon range (min to max) | Terrain profile |
+|---|---|---|---|---|---|
+| Shackleton Crater Rim | `shackleton_rim` | -89.90°, 0.00° | +648 m | -3.0° to +22.3° | High crater rim with steep inward wall |
+| Connecting Ridge | `connecting_ridge` | -89.44°, -137.31° | +1,957 m | -0.9° to +0.3° | Broad elevated ridge, nearly flat open horizon |
+| Malapert Mountain | `malapert_mountain` | -85.99°, 2.93° | +5,128 m | -5.6° to +5.2° | Massive summit looking down on the terrain |
+| Haworth Crater Rim | `haworth_rim` | -87.40°, -5.10° | -3,371 m | +2.9° to +10.9° | Enclosed terrain overlooking shadow traps |
+| Nobile Crater Rim | `nobile_rim` | -85.24°, 35.80° | +6,562 m | -7.4° to +14.9° | High mountain shoulder near the VIPER target |
+| de Gerlache Crater Rim | `de_gerlache_rim` | -88.48°, -88.35° | -1,217 m | +3.7° to +16.6° | Crater rim crest facing opposing rims |
  
-**Coordinate convention:** planetocentric latitude (negative = south), east-positive longitude, degrees, Moon mean-Earth / polar-axis frame.
+**Conventions:** planetocentric latitude (negative = south), east-positive longitude, azimuth measured clockwise from north, all times in UTC.
  
 ## 🔬 Method in detail
  
 ### 1. Terrain horizon
-For each site, we read the LOLA elevation model and, for each compass azimuth (every 1° from 0 to 359, measured clockwise from north), trace a ray outward to a maximum distance of **[MAX DISTANCE, e.g. 60 km]**. For every sample point along the ray we compute the angle above the site's local horizontal:
+For each site we trace rays along **all 360 compass azimuths** (1° steps) out to **60 km**. Terrain heights are sampled every **80 m** (or 40 m with the upgrade DEM) using bilinear interpolation (`scipy.ndimage.map_coordinates`). For each sample at ground distance `d` we compute the elevation angle:
  
 ```
-angle = atan2( terrain_height - site_height - mast_height - curvature_drop , distance )
-curvature_drop = R - sqrt(R^2 - distance^2)      (R = 1,737,400 m, Moon radius)
+drop  = R - sqrt(R^2 - d^2)            R = 1,737,400 m (Moon radius)
+angle = atan2( z_sample - z_site - mast_height - drop , d )
 ```
  
-The horizon elevation for that azimuth is the **maximum** angle along the ray. Because the polar stereographic grid does not line up with compass north, we compute **local north** for each site and rotate azimuths accordingly.
+The horizon for that azimuth is the **highest angle** along the ray. The curvature drop lowers terrain at the 60 km boundary by about 1,036 m. Observer (mast) height defaults to **0 m** and can be set with `--mast-height` (for example 2 m for a lander deck).
  
-Observer (mast) height used: **[0 m / 2 m]**.
+### 2. Local north
+A polar stereographic grid does not line up with compass north. For each site we project a point 0.01° north of it (with `pyproj`) to get the true-north direction in the grid. East is a 90° clockwise rotation of north, so any compass azimuth converts to a grid ray direction.
  
-### 2. Sun and Earth positions
-Sun and Earth azimuth and elevation, as seen from each site on the Moon's surface, come from JPL Horizons at a fixed time step (**[STEP, e.g. 60 min]**) over **[DATE RANGE]**. All times are **UTC**.
+### 3. Sun and Earth positions
+Sun and Earth azimuth and elevation per site come from the **JPL Horizons** API and web form, saved as one ephemeris file per site at a fixed time step. Date range: **[DATE RANGE]**. Time step: **[STEP]**.
  
-### 3. Visibility
-A body is considered **visible** when its elevation is above the site's horizon elevation at the body's azimuth. The Sun is treated as **[a point at its center / a disc with its upper edge]**. The Moon has essentially no atmosphere, so no atmospheric refraction is applied.
+### 4. Visibility
+A body at azimuth α (rounded to the nearest degree) is **visible** when its elevation is greater than `elev_deg[α]` for that site. The Sun is treated as a **point at its center**, so sunset is when its center drops below the terrain angle. The Sun's apparent size (about 0.26° semi-diameter) is not modeled. The Moon has essentially no atmosphere, so no refraction is applied.
  
-### 4. Events and times
-Sunset, sunrise, Earthset and Earthrise are found by scanning forward through the time series for changes between visible and hidden. Times are **[interpolated between steps / accurate to the time step]**.
+### 5. Sunset, Earthset and rises
+Events are found by scanning the ephemeris time series for changes between visible and hidden. Event times are accurate to the ephemeris time step **[CONFIRM: interpolated or not]**.
  
-### 5. Comparison
-Comparison views run the same visibility logic for multiple sites or dates on a shared time axis.
+## ✅ Validation
  
-## 🗂️ Data file formats
+What we actually checked:
  
-All files use UTC times, degrees for angles, and azimuth measured clockwise from north.
+- **Resolution cross-check:** for Shackleton Rim, the 80 m and 40 m horizon profiles differ by only **0.18° on average**, and the highest horizon point is at the same azimuth (**138°**).
+- **Mast height:** raising the observer from 0 m to 2 m lowers nearby horizon angles by about **0.11° on average** (up to 0.88°).
+- **Terrain sanity checks:** crater rims such as Shackleton show a high inward wall (+22.3°), while summits such as Malapert and Nobile show negative horizon dips (down to -5.6° and -7.4°). We also made linear plots, polar plots and hillshade maps with a north arrow for every site.
+- **Sun and Earth positions:** [ADD results of the comparison against the Horizons web form: site, date, difference]. Delete this line if not done.
+## ⚠️ Limitations
  
-**`sites.json`**
-```json
-[{ "id": "shackleton", "name": "...", "type": "south_pole", "lat": 0.0, "lon": 0.0,
-   "coords_verified": false, "desc": "...", "source_url": "..." }]
-```
+- Rays stop at 60 km, so more distant terrain is not included (much of it is hidden by the Moon's curvature anyway).
+- The Sun is a point, and the Moon's libration and the solar limb are not modeled in the point comparison.
+- Terrain resolution is 80 m for the baseline, with 40 m available as an upgrade.
+- Site coordinates are approximate.
+- Sun and Earth data covers **[DATE RANGE]** only.
+- Not an official NASA tool, and not a replacement for full mission analysis.
+## 🗺️ Roadmap
  
-**`ephemeris/<site_id>.json`**
-```json
-{ "site_id": "...", "start_utc": "YYYY-MM-DDTHH:MM:SSZ", "step_minutes": 60,
-  "sun_az": [], "sun_el": [], "earth_az": [], "earth_el": [] }
-```
- 
-**`horizon/<site_id>.json`**
-```json
-{ "site_id": "...", "az_step_deg": 1, "elev_deg": [ /* 360 values */ ],
-  "mast_height_m": 0, "dem_source": "LOLA LDEM_80S_80MPP_ADJ (PGDA)" }
-```
- 
-## 📁 Project structure
- 
-> Edit to match the real folders.
- 
-```
-cratera/
-├── public/
-│   └── data/              # processed JSON used by the app
-│       ├── sites.json
-│       ├── ephemeris/
-│       └── horizon/
-├── src/
-│   ├── app/               # pages (globe, planner, compare, about)
-│   ├── components/        # globe, sky view, timelines, cards
-│   └── lib/               # visibility logic, event finding, data loading
-├── scripts/               # data pipeline (horizon + ephemeris)
-├── CONTRACT.md            # agreed data formats
-├── AI_USAGE.md            # AI usage disclosure
-└── README.md
-```
- 
+- Custom coordinate input
+- 3D terrain view with a moving Sun
+- Apollo and other equatorial or mid-latitude sites (needs more terrain coverage)
+- A more detailed power model
+- Shareable comparison links
 ## 🧰 Tech stack
  
-> Edit to match what is actually used.
+> ✏️ Edit to match what is used.
  
-- **Frontend:** Next.js, TypeScript, Tailwind CSS
-- **Visualization:** [Plotly / D3 / Three.js, as used]
+- **App:** Next.js, TypeScript, Tailwind CSS, static export
+- **Visualization:** [Plotly / D3 / Three.js]
 - **Data pipeline:** Python (NumPy, SciPy, rasterio, pyproj, Matplotlib)
-- **Data services:** JPL Horizons API
-- **Hosting:** [Vercel / GitHub Pages / other]
+- **Hosting:** [Vercel / GitHub Pages]
 ## 🚀 Getting started
  
-**Requirements:** Node.js (LTS) and Git.
+**Run the app** (needs Node.js and Git):
  
 ```bash
 git clone https://github.com/[ORG-OR-USER]/[REPO].git
@@ -228,62 +165,26 @@ npm run dev
  
 Open http://localhost:3000.
  
-Production build:
+**Regenerate the terrain horizons** (optional): download the LOLA DEM(s) into a `raw/` folder outside version control, install `numpy scipy rasterio pyproj matplotlib`, then run:
  
 ```bash
-npm run build
+python inspect_and_locate.py
+python compute_horizon.py --mast-height 0
 ```
  
-## 🔁 Reproducing the data
+> ✏️ Adjust the commands to match your final script options.
  
-You only need this if you want to regenerate the processed files in `public/data/`.
- 
-1. Download the LOLA DEM(s) from PGDA into a folder **outside the repo** (for example `raw/`). These files are large and must not be committed.
-2. Install Python 3.10+ and the packages: `numpy scipy rasterio pyproj matplotlib requests pandas`.
-3. Run the horizon script: `[COMMAND, e.g. python scripts/make_horizons.py]`
-4. Run the ephemeris script: `[COMMAND, e.g. python scripts/fetch_ephemeris.py]`
-5. Copy the outputs into `public/data/`.
-## ✅ Validation
- 
-> Fill this in honestly with the checks you actually ran. Remove rows you did not do.
- 
-| Site | Date (UTC) | Quantity | Cratera | JPL Horizons | Difference |
-|---|---|---|---|---|---|
-| [site] | [date] | Sun elevation | [value] | [value] | [diff] |
-| [site] | [date] | Earth azimuth | [value] | [value] | [diff] |
- 
-Terrain horizons were also compared visually against Quickmap / Moon Trek for [sites].
- 
-## ⚠️ Limitations
- 
-- Terrain resolution is **[80 m / 40 m]**; very fine terrain features are not captured.
-- Horizons are computed out to **[distance]** and for a mast height of **[value]**.
-- Sites outside the LOLA south pole coverage (80-90°S) use a flat horizon.
-- Some site coordinates are approximate (see the sites table).
-- Sun and Earth data covers **[date range]** only.
-- The simple power and communication indicators are not a substitute for real mission analysis.
-- Cratera is a prototype built during a hackathon and is not an official NASA tool.
-## 🗺️ Roadmap
- 
-- Custom coordinate input
-- 3D terrain view with a moving Sun
-- More sites, including additional CLPS and international missions
-- A more detailed power model (solar angle, partial shadowing)
-- Shareable links for comparisons
 ## 🤖 AI usage disclosure
  
-AI tools were used to assist with coding, data processing and writing during this hackathon. The team reviewed, tested and integrated the output, and all commits were authored and pushed by registered human team members from their own accounts. Full details are in [AI_USAGE.md](./AI_USAGE.md).
+AI tools helped with coding and writing. AI agents wrote the first versions of the terrain scripts, and the team chose the parameters and sites, reviewed and tested the output, and integrated it. All commits were authored and pushed by registered human team members from their own accounts. Full details: [AI_USAGE.md](./AI_USAGE.md).
  
-## 🙏 Credits and acknowledgments
+## 🙏 Credits
  
-- **NASA LRO / LOLA** team and the **Planetary Geodesy Data Archive (PGDA)** for lunar elevation data
-- **NASA JPL Horizons** system for ephemeris data
-- **USGS Astrogeology** for planetary nomenclature
+- **NASA LRO / LOLA** team and the **Planetary Geodesy Data Archive (PGDA)**
+- **NASA JPL Horizons** system
 - **LROC / Arizona State University** (Quickmap) and **NASA Moon Trek**
 - The **NASA Space Apps Challenge 2026** organizers, navigators and mentors
-
- 
 ---
  
-*🌙 Built for the NASA Space Apps Challenge 2026 by [ERROR-404].*
+*🌙 Built for the NASA Space Apps Challenge 2026 by Team ERROR-404.*
  
