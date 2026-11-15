@@ -26,10 +26,10 @@ def compute_hillshade(dem_array, res=80.0, alt_deg=25.0, az_deg=315.0):
     dy, dx = np.gradient(valid, res, res)
     slope = np.arctan(np.hypot(dx, dy))
     aspect = np.arctan2(-dy, dx)
-    
+
     alt_rad = np.radians(alt_deg)
     az_rad = np.radians(360.0 - az_deg + 90.0)
-    
+
     shaded = np.sin(alt_rad) * np.cos(slope) + np.cos(alt_rad) * np.sin(slope) * np.cos(az_rad - aspect)
     shaded = np.clip(255.0 * (shaded + 1.0) / 2.0, 0, 255).astype(np.uint8)
     return shaded
@@ -48,48 +48,48 @@ def get_local_north_and_east(lat, lon, transformer):
 def compute_horizon_site(src, site, transformer, max_dist_m=60000.0, step_m=80.0, mast_height_m=0.0):
     lat, lon = site["lat"], site["lon"]
     x_site, y_site = transformer.transform(lon, lat)
-    
+
     u_north, u_east, grid_north_deg = get_local_north_and_east(lat, lon, transformer)
-    
+
     margin = step_m * 25.0
     radius = max_dist_m + margin
     left = max(src.bounds.left, x_site - radius)
     right = min(src.bounds.right, x_site + radius)
     bottom = max(src.bounds.bottom, y_site - radius)
     top = min(src.bounds.top, y_site + radius)
-    
+
     win = from_bounds(left, bottom, right, top, transform=src.transform)
     win = win.round_offsets().round_lengths()
     win_transform = rasterio.windows.transform(win, src.transform)
-    
+
     dem_win = src.read(1, window=win)
-    
+
     sub_c_site = (x_site - win_transform.c) / win_transform.a - 0.5
     sub_r_site = (y_site - win_transform.f) / win_transform.e - 0.5
     z_site = float(map_coordinates(dem_win, [[sub_r_site], [sub_c_site]], order=1, mode='nearest')[0])
-    
+
     az_deg = np.arange(360, dtype=np.float64)
     az_rad = np.radians(az_deg)
-    
+
     ux = np.cos(az_rad) * u_north[0] + np.sin(az_rad) * u_east[0]
     uy = np.cos(az_rad) * u_north[1] + np.sin(az_rad) * u_east[1]
-    
+
     d = np.arange(step_m, max_dist_m + 0.1, step_m, dtype=np.float64)
     X = x_site + ux[:, None] * d[None, :]
     Y = y_site + uy[:, None] * d[None, :]
-    
+
     cols = (X - win_transform.c) / win_transform.a - 0.5
     rows = (Y - win_transform.f) / win_transform.e - 0.5
-    
+
     coords = np.vstack([rows.ravel(), cols.ravel()])
     z_samples = map_coordinates(dem_win, coords, order=1, mode='nearest').reshape(360, len(d))
-    
+
     drop = MOON_RADIUS - np.sqrt(MOON_RADIUS**2 - d**2)
     delta_z = z_samples - (z_site + mast_height_m) - drop[None, :]
     angles_deg = np.degrees(np.arctan2(delta_z, d[None, :]))
-    
+
     horizon_deg = np.max(angles_deg, axis=1)
-    
+
     return {
         "site_id": site["id"],
         "name": site["name"],
@@ -112,17 +112,17 @@ def plot_and_verify_site(res, plots_dir):
     site_id = res["site_id"]
     name = res["name"]
     horizon = res["horizon_deg"]
-    
+
     fig, ax = plt.subplots(figsize=(10, 4), dpi=150)
     az = np.arange(360)
     ax.plot(az, horizon, color="#1f77b4", lw=1.8, label="Horizon Profile")
     ax.fill_between(az, horizon, -10, color="#1f77b4", alpha=0.25)
     ax.axhline(0, color="gray", linestyle="--", lw=0.8, alpha=0.7, label="Local Horizontal (0°)")
-    
+
     max_idx = int(np.argmax(horizon))
-    ax.scatter([max_idx], [horizon[max_idx]], color="red", s=40, zorder=5, 
+    ax.scatter([max_idx], [horizon[max_idx]], color="red", s=40, zorder=5,
                label=f"Peak: {horizon[max_idx]:.2f}° @ {max_idx}° az")
-    
+
     ax.set_xlim(0, 359)
     ax.set_xticks(np.arange(0, 361, 45))
     ax.set_xticklabels(["N (0°)", "NE (45°)", "E (90°)", "SE (135°)", "S (180°)", "SW (225°)", "W (270°)", "NW (315°)", "N (360°)"])
@@ -133,7 +133,7 @@ def plot_and_verify_site(res, plots_dir):
     fig.tight_layout()
     fig.savefig(os.path.join(plots_dir, f"{site_id}_horizon.png"))
     plt.close(fig)
-    
+
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={"projection": "polar"}, dpi=150)
     theta = np.radians(az)
     ax.set_theta_zero_location("N")
@@ -144,25 +144,25 @@ def plot_and_verify_site(res, plots_dir):
     fig.tight_layout()
     fig.savefig(os.path.join(plots_dir, f"{site_id}_polar.png"))
     plt.close(fig)
-    
+
     dem_win = res["dem_win"]
     hs = compute_hillshade(dem_win, res=80.0)
     fig, ax = plt.subplots(figsize=(7, 7), dpi=150)
     ax.imshow(hs, cmap="gray", origin="upper")
-    
+
     r_site, c_site = res["sub_r_site"], res["sub_c_site"]
     ax.plot(c_site, r_site, marker="*", color="red", markersize=14, markeredgecolor="yellow", markeredgewidth=1.2, label=f"Site: {name}")
-    
+
     arrow_len = 0.15 * dem_win.shape[1]
     dx_col = arrow_len * res["u_north"][0]
     dy_row = -arrow_len * res["u_north"][1]
-    
+
     ax.annotate("", xy=(c_site + dx_col, r_site + dy_row), xytext=(c_site, r_site),
                 arrowprops=dict(facecolor="cyan", edgecolor="black", width=2.5, headwidth=9))
-    ax.text(c_site + dx_col * 1.15, r_site + dy_row * 1.15, "True North", color="cyan", 
+    ax.text(c_site + dx_col * 1.15, r_site + dy_row * 1.15, "True North", color="cyan",
             fontweight="bold", fontsize=11, ha="center", va="center",
             bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.6, edgecolor="none"))
-    
+
     ax.set_title(f"Terrain & Local True North: {name}\n(Lat: {res['lat']:.2f}°, Lon: {res['lon']:.2f}°)")
     ax.axis("off")
     ax.legend(loc="lower right", facecolor="white", framealpha=0.85)
@@ -217,10 +217,10 @@ def main():
     geo_crs = pyproj.CRS.from_proj4(f"+proj=longlat +R={MOON_RADIUS} +no_defs")
     dem_crs = pyproj.CRS.from_string("IAU:30135")
     transformer = pyproj.Transformer.from_crs(geo_crs, dem_crs, always_xy=True)
-    
+
     with open(args.sites, "r", encoding="utf-8") as f:
         all_sites = json.load(f)
-        
+
     if args.site != "all":
         sites = [s for s in all_sites if s["id"] == args.site]
         if not sites:
@@ -238,14 +238,14 @@ def main():
     with rasterio.open(dem_source_path) as src:
         for s in sites:
             print(f"\nProcessing '{s['id']}' ({s['name']})...")
-            res = compute_horizon_site(src, s, transformer, 
-                                       max_dist_m=args.max_dist, 
-                                       step_m=step_m, 
+            res = compute_horizon_site(src, s, transformer,
+                                       max_dist_m=args.max_dist,
+                                       step_m=step_m,
                                        mast_height_m=args.mast_height)
             results.append(res)
-            
+
             plot_and_verify_site(res, out_plots_dir)
-            
+
             elev_rounded = [float(round(val, 2)) for val in res["horizon_deg"]]
             json_out = {
                 "site_id": s["id"],
