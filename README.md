@@ -47,6 +47,7 @@ npm run build    # static export to ./out
 |---|---|---|
 | Claude (Anthropic) | Initial project scaffold: Next.js pages (Planner, Compare, About), SVG components, event-finding logic and its unit tests, data loader, GitHub Pages workflow, CONTRACT.md, mock data, this README draft | Reviewed, ran and tested the code, integrated real data, edited text. TODO: describe your own changes |
 | TODO (e.g. Antigravity / Gemma / AI Studio) | TODO | TODO |
+Google AI Studio
 
 No AI tool is a commit author or contributor; all commits are made by team members from their own accounts. Data files in `public/data/` marked MOCK are placeholders until replaced with real Horizons/LOLA outputs.
 
