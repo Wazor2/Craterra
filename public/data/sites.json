@@ -1,0 +1,29 @@
+[
+ {
+  "id": "shackleton_rim",
+  "name": "Shackleton Crater Rim (MOCK)",
+  "lat": -89.9,
+  "lon": 0.0,
+  "type": "south_pole",
+  "source_url": "TODO",
+  "description": "MOCK. Replace with sourced text."
+ },
+ {
+  "id": "malapert_massif",
+  "name": "Malapert Massif (MOCK)",
+  "lat": -85.9,
+  "lon": 0.0,
+  "type": "south_pole",
+  "source_url": "TODO",
+  "description": "MOCK."
+ },
+ {
+  "id": "apollo_11",
+  "name": "Apollo 11 (MOCK)",
+  "lat": 0.67,
+  "lon": 23.47,
+  "type": "apollo",
+  "source_url": "TODO",
+  "description": "MOCK."
+ }
+]
