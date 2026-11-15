@@ -7,6 +7,8 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Sunrise,
+  Sunset,
 } from "lucide-react";
 import { timeUntil } from "../lib/events";
 
@@ -42,7 +44,9 @@ export function TimeScrubber({
   const [playing, setPlaying] = useState(false);
   const [speedHours, setSpeedHours] = useState<PlaySpeedHoursPerSec>(6);
   const [requestedOutside, setRequestedOutside] = useState<string | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(
+    () => variant === "standard"
+  );
 
   useEffect(() => {
     if (!playing) return;
@@ -199,25 +203,29 @@ export function TimeScrubber({
               {(
                 [
                   {
-                    label: "Sunrise",
+                    label: "Next Sunrise",
+                    aria: "Jump to next lunar sunrise",
                     ms: nextSunriseMs,
                     countdown: sunriseIn,
                     accent: "hover:border-[#eab354]",
                   },
                   {
-                    label: "Sunset",
+                    label: "Next Sunset",
+                    aria: "Jump to next lunar sunset",
                     ms: nextSunsetMs,
                     countdown: sunsetIn,
                     accent: "hover:border-[#eab354]",
                   },
                   {
-                    label: "Earthrise",
+                    label: "Next Earthrise",
+                    aria: "Jump to next Earthrise",
                     ms: nextEarthriseMs,
                     countdown: earthriseIn,
                     accent: "hover:border-[#56B4E9]",
                   },
                   {
-                    label: "Earthset",
+                    label: "Next Earthset",
+                    aria: "Jump to next Earthset",
                     ms: nextEarthsetMs,
                     countdown: earthsetIn,
                     accent: "hover:border-[#56B4E9]",
@@ -228,9 +236,10 @@ export function TimeScrubber({
                   key={ev.label}
                   type="button"
                   disabled={ev.ms === null}
+                  aria-label={ev.aria}
                   title={
                     ev.ms === null
-                      ? `No ${ev.label} crossing exists after current time in loaded data`
+                      ? `No ${ev.label.toLowerCase()} crossing exists after current time in loaded data`
                       : `Jump to ${new Date(ev.ms).toISOString()}`
                   }
                   onClick={() => {
@@ -295,6 +304,55 @@ export function TimeScrubber({
             />
           </div>
 
+          {showEventJumps && (
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                disabled={nextSunriseMs === null}
+                onClick={() => {
+                  if (nextSunriseMs !== null) {
+                    setPlaying(false);
+                    setRequestedOutside(null);
+                    onChange(nextSunriseMs);
+                  }
+                }}
+                aria-label="Jump to next lunar sunrise"
+                title={
+                  nextSunriseMs === null
+                    ? "No lunar sunrise crossing after current time"
+                    : `Jump to next lunar sunrise (${new Date(nextSunriseMs).toISOString()})`
+                }
+                className="inline-flex h-7 items-center gap-1 rounded-[4px] border border-[#1f2530] bg-[#151922] px-2 text-[11px] font-medium text-[#eab354] hover:border-[#eab354] transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap shrink-0"
+              >
+                <Sunrise size={12} aria-hidden="true" />
+                <span className="hidden md:inline">Next Sunrise</span>
+                <span className="md:hidden">Rise</span>
+              </button>
+              <button
+                type="button"
+                disabled={nextSunsetMs === null}
+                onClick={() => {
+                  if (nextSunsetMs !== null) {
+                    setPlaying(false);
+                    setRequestedOutside(null);
+                    onChange(nextSunsetMs);
+                  }
+                }}
+                aria-label="Jump to next lunar sunset"
+                title={
+                  nextSunsetMs === null
+                    ? "No lunar sunset crossing after current time"
+                    : `Jump to next lunar sunset (${new Date(nextSunsetMs).toISOString()})`
+                }
+                className="inline-flex h-7 items-center gap-1 rounded-[4px] border border-[#1f2530] bg-[#151922] px-2 text-[11px] font-medium text-[#eab354] hover:border-[#eab354] transition-colors disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap shrink-0"
+              >
+                <Sunset size={12} aria-hidden="true" />
+                <span className="hidden md:inline">Next Sunset</span>
+                <span className="md:hidden">Set</span>
+              </button>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={() => shiftHours(14 * 24)}
@@ -323,7 +381,7 @@ export function TimeScrubber({
             aria-expanded={showAdvanced}
             className="inline-flex h-7 items-center gap-1 rounded-[4px] border border-[#1f2530] bg-[#090b10] px-2 text-[11px] font-medium text-[#9aa3b2] hover:border-[#2d3544] hover:text-[#edf0f5] transition-colors whitespace-nowrap shrink-0"
           >
-            <span>Date</span>
+            <span>Date/Time</span>
             {showAdvanced ? <ChevronDown size={12} /> : <ChevronUp size={12} />}
           </button>
         </div>

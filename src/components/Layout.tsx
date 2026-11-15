@@ -53,7 +53,7 @@ export function Layout({ currentRoute, onNavigate, children }: LayoutProps) {
             onClick={() => handleNav("/")}
             className="font-display text-base sm:text-lg font-semibold tracking-tight text-[#edf0f5] whitespace-nowrap shrink-0 text-left hover:text-[#eab354] transition-colors"
           >
-            Lunar Landing Site Planner
+            Cratera
           </button>
 
           {/* Zone 2: Clean single-line text navigation links */}

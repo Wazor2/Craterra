@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { Activity, ArrowLeft, MapPin } from "lucide-react";
 import { FloatingSitesWindow } from "../components/FloatingSitesWindow";
 import { IllumHeatmap } from "../components/IllumHeatmap";
 import { LunarScene3D } from "../components/LunarScene3D";
@@ -18,6 +18,7 @@ import {
 import { currentState, nextEvent } from "../lib/events";
 import { endEpoch } from "../lib/geometry";
 import type { Ephemeris, LoadedHorizon, Site, Summaries } from "../lib/types";
+import { windowStats } from "../lib/windows";
 
 const LUNAR_DAY_MS = 29.53 * 86_400_000;
 
@@ -55,6 +56,9 @@ export function PlannerPage({
   );
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("globe");
   const [sitesWindowOpen, setSitesWindowOpen] = useState(false);
+  const [telemetryOpen, setTelemetryOpen] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
 
   const handleSelectSiteFromGlobe = useCallback(
     (siteId: string) => {
@@ -171,14 +175,21 @@ export function PlannerPage({
       nowMs,
       "set"
     );
+    const lunarDayStats = windowStats(
+      ephemeris,
+      horizon,
+      stripWindowStartMs,
+      29.53
+    );
     return {
       state,
       nextSunriseMs,
       nextSunsetMs,
       nextEarthriseMs,
       nextEarthsetMs,
+      lunarDayStats,
     };
-  }, [ephemeris, horizon, nowMs]);
+  }, [ephemeris, horizon, nowMs, stripWindowStartMs]);
 
   const activeSite = sites.find((s) => s.id === selectedSiteId);
   const activeSummary = summaries?.[selectedSiteId];
@@ -263,6 +274,7 @@ export function PlannerPage({
                 nextSunsetMs={computed.nextSunsetMs}
                 nextEarthriseMs={computed.nextEarthriseMs}
                 nextEarthsetMs={computed.nextEarthsetMs}
+                lunarDayStats={computed.lunarDayStats}
               />
             )}
 
@@ -359,6 +371,25 @@ export function PlannerPage({
               <span>Sites</span>
             </button>
 
+            {ready && activeTab === "3d" && (
+              <>
+                <span aria-hidden="true" className="h-4 w-px bg-[#1f2530] shrink-0" />
+                <button
+                  type="button"
+                  onClick={() => setTelemetryOpen((v) => !v)}
+                  aria-expanded={telemetryOpen}
+                  className={`inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+                    telemetryOpen
+                      ? "bg-[#151922] text-[#56B4E9]"
+                      : "text-[#9aa3b2] hover:bg-[#151922] hover:text-[#edf0f5]"
+                  }`}
+                >
+                  <Activity size={12} aria-hidden="true" />
+                  <span>Key Numbers</span>
+                </button>
+              </>
+            )}
+
             {activeTab !== "globe" && activeSite && (
               <>
                 <span aria-hidden="true" className="h-4 w-px bg-[#1f2530] shrink-0" />
@@ -426,9 +457,26 @@ export function PlannerPage({
         onCompareSite={onCompareSite}
       />
 
+      {/* Collapsible Top-Left Key Numbers Deck in 3D Terrain view */}
+      {ready && activeTab === "3d" && telemetryOpen && !sitesWindowOpen && (
+        <div className="pointer-events-auto absolute top-[58px] left-3 right-3 sm:right-auto sm:left-4 sm:w-[348px] z-10">
+          <NumberCards
+            variant="deck"
+            state={computed.state}
+            nowMs={nowMs}
+            nextSunriseMs={computed.nextSunriseMs}
+            nextSunsetMs={computed.nextSunsetMs}
+            nextEarthriseMs={computed.nextEarthriseMs}
+            nextEarthsetMs={computed.nextEarthsetMs}
+            lunarDayStats={computed.lunarDayStats}
+            onClose={() => setTelemetryOpen(false)}
+          />
+        </div>
+      )}
+
       {/* Slim Single-Line UTC Time Bar (only in 3D Terrain view; omitted on Moon Globe) */}
       {ready && activeTab === "3d" && (
-        <div className="pointer-events-none absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-auto sm:w-[560px] lg:w-[600px] z-20">
+        <div className="pointer-events-none absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-auto sm:w-[calc(100vw-32px)] lg:w-[680px] xl:w-[740px] lg:max-w-[calc(100vw-360px)] z-20">
           <div className="pointer-events-auto">
             <TimeScrubber
               variant="minimal"
