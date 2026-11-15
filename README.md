@@ -207,3 +207,9 @@ AI tools helped with coding and writing. AI agents wrote the first versions of t
 ---
 
 *🌙 Built for the NASA Space Apps Challenge 2026 by Team ERROR-404.*
+- **NASA JPL Horizons** system
+- **LROC / Arizona State University** (Quickmap) and **NASA Moon Trek**
+- The **NASA Space Apps Challenge 2026** organizers, navigators and mentors
+---
+
+*🌙 Built for the NASA Space Apps Challenge 2026 by Team ERROR-404.*
