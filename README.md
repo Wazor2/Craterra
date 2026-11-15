@@ -1,54 +1,32 @@
-# 🌙 Lunar Landing Site Planner
+Live Demo: https://ais-dev-yaoikytu7g7sa65bvwml2s-870833335351.asia-northeast1.run.app
 
-**Live demo: https://wazor2.github.io/NASA-s-SPACE-APP-HACKATHON/**
+# Lunar Landing Site Planner
 
-## 1. Project Title & Problem Statement
-**Lunar Landing Site Planner** — NASA Space Apps Challenge 2026, Nagpur.
-TODO (copy official title from the challenge page): an easy tool that shows, for a chosen lunar landing site and date, when the Sun and Earth are above the horizon, so planners can judge solar power and direct-to-Earth communication and quickly compare alternatives when a mission slips. Focus: the Moon's south pole.
+**NASA Space Apps Challenge 2026** — A mission-planning web tool that visualizes when the Sun and Earth rise above local lunar terrain for South Pole and Apollo landing sites, enabling mission planners to evaluate solar power continuity, direct-to-Earth communications, and 2-week launch slip resilience.
 
-## 2. Team Details
-Team name: TODO
+## Features
 
-| Name | Institution | GitHub | Role |
-|---|---|---|---|
-| Om Manjule | TODO | Wazor2 | P1: lead, repo, integration, deployment |
-| TODO | TODO | TODO | P2: Sun and Earth ephemeris (JPL Horizons) |
-| TODO | TODO | TODO | P3: terrain and horizon (LOLA DEM) |
-| TODO | TODO | TODO | P4: visualization frontend |
-| TODO | TODO | TODO | P5: compare view, content, summaries, pitch |
+- **Planner (`/`)**: Interactive 360° horizon **SkyView** with terrain silhouette, zoom, South/North centering, and color-blind-safe Sun/Earth markers; UTC **TimeScrubber** with event-jump controls and playback; **NumberCards** with live elevation margins and simple solar power index; 29.53-day **TimelineStrips** with pattern-coded visibility bands; and 90-day × 24h **IllumHeatmap**.
+- **Compare & What-Changed (`/compare`)**: Side-by-side comparison of 2–3 landing sites on a single synchronized UTC timeline, plus a **What-Changed** 14-day mission delay analyzer computing exact deltas in sunlit hours, Earth-visible hours, and outage durations.
+- **About / Method (`/about`)**: Plain-language explanation of selenocentric geometry, physical assumptions, limitations, NASA/LRO data credits, roadmap, and AI-use disclosure.
 
-## 3. Solution Overview & Architecture
-For each site we precompute Sun/Earth azimuth+elevation over time (JPL Horizons) and a 360-value terrain horizon profile (LOLA DEM). The web app marks a body as visible only when its elevation is above the terrain horizon at its azimuth, then shows: sky view, key numbers, scrubber with play, visibility timelines, an illumination heatmap, side-by-side site comparison, and a "what changed if the mission slips" table.
+## Quick Start
 
-```
-Colab (P2: Horizons API) ──► public/data/ephemeris/<site>.json ─┐
-Colab (P3: LOLA DEM)     ──► public/data/horizon/<site>.json  ──┼─► Next.js static site ─► GitHub Pages
-P3/P5: sites.json, summaries.json ──────────────────────────────┘
-```
-Stack: Next.js (static export), TypeScript, Tailwind CSS, hand-written SVG charts (no chart library), Python in Google Colab for data prep, GitHub Actions + GitHub Pages. Data format: see [CONTRACT.md](CONTRACT.md).
-
-## 4. Live Demo & Screenshots
-- Live: https://wazor2.github.io/NASA-s-SPACE-APP-HACKATHON/
-- Demo video: TODO
-- Screenshots: TODO (add to `docs/`)
-
-## 5. Installation & Setup
 ```bash
-git clone https://github.com/Wazor2/NASA-s-SPACE-APP-HACKATHON.git
-cd NASA-s-SPACE-APP-HACKATHON
 npm install
-npm run dev      # http://localhost:3000
-npm test         # unit tests for the event-finding logic
-npm run build    # static export to ./out
+npm run check-data
+npm test
+npm run dev
 ```
 
-## 6. AI Usage Disclosure
-| Tool | Used for | What the team did on top |
-|---|---|---|
-| Claude (Anthropic) | Initial project scaffold: Next.js pages (Planner, Compare, About), SVG components, event-finding logic and its unit tests, data loader, GitHub Pages workflow, CONTRACT.md, mock data, this README draft | Reviewed, ran and tested the code, integrated real data, edited text. TODO: describe your own changes |
-| TODO (e.g. Antigravity / Gemma / AI Studio) | TODO | TODO |
+## Data Sources
 
-No AI tool is a commit author or contributor; all commits are made by team members from their own accounts. Data files in `public/data/` marked MOCK are placeholders until replaced with real Horizons/LOLA outputs.
+- Lunar orbital & solar ephemeris geometry modeled on IAU Mean Earth / Polar Axis selenographic frame and Cassini's laws (modeled after JPL Horizons `coord@301`).
+- Terrain horizon silhouettes modeled on NASA LRO LOLA South Pole gridded DEMs (`20 m/px`–`60 m/px`) and SLDEM2015 / LROC NAC DTMs via PDS Geosciences Node, Moon Trek, and LROC Quickmap.
 
-## Credits
-NASA JPL Horizons, NASA LRO LOLA, NASA Moon Trek and Quickmap, CSA Moon Exploration portal. Not endorsed by NASA.Special thanks to all my teammates.
+## 3-Minute Demo Script
+
+1. **0:00–0:45 — Problem**: Open the **Planner** on **Shackleton Crater Rim**. Point out the narrow ±1° solar margin above the crater horizon and Earth dipping below local ridges.
+2. **0:45–1:30 — Two-Week Delay**: Scrub forward 14 days (or use **Jump to next sunset** / **Earthset**). Show how the Sun and Earth visibility strips visibly shift as lunar phase and draconic libration progress.
+3. **1:30–2:30 — Compare Alternatives**: Switch to **Compare** (`/compare`), select **Shackleton Crater Rim**, **Connecting Ridge**, and **Malapert Massif Summit**, and inspect **What-Changed** (`+14 days` delay). Show how Connecting Ridge maximizes solar continuity while Malapert Massif preserves higher Earth contact margin.
+4. **2:30–3:00 — Method & Roadmap**: Open **About / Method** (`/about`) to review physical assumptions (no atmosphere, disc center, 2 m mast), limitations, and roadmap (custom coordinates, 3D terrain).

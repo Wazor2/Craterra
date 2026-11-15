@@ -1,14 +1,98 @@
 {
- "shackleton_rim": {
-  "plain_text": "MOCK",
-  "expert_text": "MOCK"
- },
- "malapert_massif": {
-  "plain_text": "MOCK",
-  "expert_text": "MOCK"
- },
- "apollo_11": {
-  "plain_text": "MOCK",
-  "expert_text": "MOCK"
- }
+  "shackleton_rim": {
+    "plain_text": "At Shackleton Crater Rim, the Sun is above local terrain for 59.4% of the 90-day window and Earth is visible for 43.8%; the longest continuous dark stretch is 322 h starting 2027-01-31T22:00 UTC.",
+    "expert_text": "Sun elevation spans -0.92° to 1.83° (terrain margin -1.42° to 1.70° over -0.40°..1.74° horizon); Earth elevation spans -7.11° to 6.53° (43.8% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 59.4,
+      "earth_visible_pct": 43.8,
+      "longest_dark_hours": 322,
+      "longest_dark_start_utc": "2027-01-31T22:00 UTC",
+      "sun_el_min": -0.92,
+      "sun_el_max": 1.83,
+      "earth_el_min": -7.11,
+      "earth_el_max": 6.53,
+      "horizon_min": -0.4,
+      "horizon_max": 1.74
+    }
+  },
+  "connecting_ridge": {
+    "plain_text": "At Connecting Ridge (Shackleton–de Gerlache), the Sun is above local terrain for 74.8% of the 90-day window and Earth is visible for 39.1%; the longest continuous dark stretch is 323 h starting 2027-02-15T14:00 UTC.",
+    "expert_text": "Sun elevation spans -0.79° to 2.01° (terrain margin -1.39° to 2.86° over -0.97°..0.71° horizon); Earth elevation spans -7.30° to 6.50° (39.1% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 74.8,
+      "earth_visible_pct": 39.1,
+      "longest_dark_hours": 323,
+      "longest_dark_start_utc": "2027-02-15T14:00 UTC",
+      "sun_el_min": -0.79,
+      "sun_el_max": 2.01,
+      "earth_el_min": -7.3,
+      "earth_el_max": 6.5,
+      "horizon_min": -0.97,
+      "horizon_max": 0.71
+    }
+  },
+  "malapert_massif": {
+    "plain_text": "At Malapert Massif Summit, the Sun is above local terrain for 52.8% of the 90-day window and Earth is visible for 64.5%; the longest continuous dark stretch is 364 h starting 2027-01-30T03:00 UTC.",
+    "expert_text": "Sun elevation spans -3.93° to 5.22° (terrain margin -4.64° to 5.46° over -0.84°..1.46° horizon); Earth elevation spans -2.86° to 10.86° (64.5% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 52.8,
+      "earth_visible_pct": 64.5,
+      "longest_dark_hours": 364,
+      "longest_dark_start_utc": "2027-01-30T03:00 UTC",
+      "sun_el_min": -3.93,
+      "sun_el_max": 5.22,
+      "earth_el_min": -2.86,
+      "earth_el_max": 10.86,
+      "horizon_min": -0.84,
+      "horizon_max": 1.46
+    }
+  },
+  "nobile_rim": {
+    "plain_text": "At Nobile Crater Rim West, the Sun is above local terrain for 36.6% of the 90-day window and Earth is visible for 57.3%; the longest continuous dark stretch is 464 h starting 2027-01-25T01:00 UTC.",
+    "expert_text": "Sun elevation spans -4.57° to 6.05° (terrain margin -5.65° to 4.38° over -0.22°..3.64° horizon); Earth elevation spans -3.48° to 9.40° (57.3% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 36.6,
+      "earth_visible_pct": 57.3,
+      "longest_dark_hours": 464,
+      "longest_dark_start_utc": "2027-01-25T01:00 UTC",
+      "sun_el_min": -4.57,
+      "sun_el_max": 6.05,
+      "earth_el_min": -3.48,
+      "earth_el_max": 9.4,
+      "horizon_min": -0.22,
+      "horizon_max": 3.64
+    }
+  },
+  "apollo_11": {
+    "plain_text": "At Apollo 11 — Mare Tranquillitatis, the Sun is above local terrain for 49.1% of the 90-day window and Earth is visible for 100%; the longest continuous dark stretch is 357 h starting 2026-12-29T11:00 UTC.",
+    "expert_text": "Sun elevation spans -89.64° to 89.59° (terrain margin -90.21° to 89.44° over 0.03°..0.64° horizon); Earth elevation spans 58.12° to 73.70° (100% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 49.1,
+      "earth_visible_pct": 100,
+      "longest_dark_hours": 357,
+      "longest_dark_start_utc": "2026-12-29T11:00 UTC",
+      "sun_el_min": -89.64,
+      "sun_el_max": 89.59,
+      "earth_el_min": 58.12,
+      "earth_el_max": 73.7,
+      "horizon_min": 0.03,
+      "horizon_max": 0.64
+    }
+  },
+  "apollo_17": {
+    "plain_text": "At Apollo 17 — Taurus-Littrow Valley, the Sun is above local terrain for 46.3% of the 90-day window and Earth is visible for 100%; the longest continuous dark stretch is 378 h starting 2026-12-28T17:00 UTC.",
+    "expert_text": "Sun elevation spans -71.25° to 70.06° (terrain margin -89.84° to 60.20° over 1.35°..18.87° horizon); Earth elevation spans 43.84° to 63.36° (100% direct-to-Earth visibility).",
+    "stats": {
+      "sunlit_pct": 46.3,
+      "earth_visible_pct": 100,
+      "longest_dark_hours": 378,
+      "longest_dark_start_utc": "2026-12-28T17:00 UTC",
+      "sun_el_min": -71.25,
+      "sun_el_max": 70.07,
+      "earth_el_min": 43.84,
+      "earth_el_max": 63.36,
+      "horizon_min": 1.35,
+      "horizon_max": 18.87
+    }
+  }
 }
